@@ -4,10 +4,12 @@ import AdminPage from "./pages/AdminPage";
 import HomePage from "./pages/HomePage";
 import InquiryPage from "./pages/InquiryPage";
 import PortfolioPage from "./pages/PortfolioPage";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route element={<PublicLayout />}>
           <Route index element={<HomePage />} />
@@ -15,7 +17,10 @@ function App() {
           <Route path="/inquiry" element={<InquiryPage />} />
         </Route>
 
-        <Route path="/admin" element={<AdminPage onError={() => {}} onOk={() => {}} />} />
+        <Route
+          path="/admin"
+          element={<AdminPage onError={() => {}} onOk={() => {}} />}
+        />
         <Route path="*" element={<Navigate replace to="/" />} />
       </Routes>
     </BrowserRouter>
