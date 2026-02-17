@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import ProjectCard from "../components/common/ProjectCard";
 import Button from "../components/ui/Button";
 import ButtonLink from "../components/ui/ButtonLink";
@@ -12,7 +13,13 @@ import { mockFeaturedProjects } from "../mocks/mockProjects.js";
 export default function HomePage() {
   return (
     <>
-      <section className="mx-auto w-full max-w-310 px-6 pb-24 pt-12 md:pt-14 h-screen">
+      <motion.section
+        initial={{ opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ amount: 0.25 }}
+        transition={{ duration: 0.55, ease: "easeOut" }}
+        className="mx-auto h-screen w-full max-w-310 px-6 pt-12 md:pt-14"
+      >
         <div className="grid items-center gap-10 lg:grid-cols-[0.44fr_0.56fr]">
           <div>
             <Chip>Interior Design Studio</Chip>
@@ -53,9 +60,15 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="mx-auto w-full max-w-310 px-6 pb-28">
+      <motion.section
+        initial={{ opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ amount: 0.2 }}
+        transition={{ duration: 0.55, ease: "easeOut" }}
+        className="mx-auto w-full max-w-310 px-6 pb-28"
+      >
         <Chip>Featured Projects</Chip>
         <div className="mb-9 flex items-baseline justify-between">
           <div>
@@ -91,9 +104,15 @@ export default function HomePage() {
             모든 프로젝트 보기
           </ButtonLink>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="mx-auto w-full max-w-310 px-6 pb-32">
+      <motion.section
+        initial={{ opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ amount: 0.15 }}
+        transition={{ duration: 0.55, ease: "easeOut" }}
+        className="mx-auto w-full max-w-310 px-6 pb-32"
+      >
         <div className="grid gap-10 lg:grid-cols-[0.47fr_0.53fr]">
           <div className="pt-4">
             <Chip>Get In Touch</Chip>
@@ -105,9 +124,9 @@ export default function HomePage() {
               일정에 맞춰 상담을 도와드리겠습니다.
             </p>
             <ul className="mt-8 space-y-2 text-sm text-text-muted">
-              <li>contact@sowainterior.com</li>
-              <li>+82 2-1234-5678</li>
-              <li>서울특별시 강남구 테헤란로 123</li>
+              <li>ech0701@naver.com</li>
+              <li>+82 10-9457-7283</li>
+              <li>서울특별시, 강남구 논현동 123-3번지, 1층</li>
             </ul>
           </div>
 
@@ -215,7 +234,7 @@ export default function HomePage() {
             </form>
           </div>
         </div>
-      </section>
+      </motion.section>
     </>
   );
 }
