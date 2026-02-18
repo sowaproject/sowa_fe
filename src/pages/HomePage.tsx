@@ -7,10 +7,34 @@ import FieldLabel from "../components/ui/FieldLabel";
 import RadioOption from "../components/ui/RadioOption";
 import TextArea from "../components/ui/TextArea";
 import TextInput from "../components/ui/TextInput";
+import { useInquiryCreate } from "../components/inquiry/hooks/useInquiryCreate";
 
 import { mockFeaturedProjects } from "../mocks/mockProjects.js";
 
 export default function HomePage() {
+  const homeInquiryState = useInquiryCreate({
+    successMessage: "문의가 등록되었습니다.",
+  });
+
+  const {
+    register,
+    watch,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = homeInquiryState.form;
+
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 3) {
+      return digits;
+    }
+    if (digits.length <= 7) {
+      return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    }
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  };
+
   return (
     <>
       <motion.section
@@ -131,28 +155,57 @@ export default function HomePage() {
           </div>
 
           <div className="rounded-2xl border border-line bg-card p-7 shadow-sm md:p-8">
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit(homeInquiryState.onSubmitValues)}>
               <FieldLabel required>이름</FieldLabel>
               <TextInput
-                type="text"
+                {...register("name")}
                 placeholder="이름을 입력해주세요."
                 className="mt-2 h-11 px-4"
+                maxLength={10}
               />
+              {errors.name ? (
+                <p className="text-xs text-red-600">{errors.name.message}</p>
+              ) : null}
 
               <FieldLabel required>연락처</FieldLabel>
               <TextInput
-                type="text"
+                value={watch("phone")}
+                onValueChange={(value) =>
+                  setValue("phone", formatPhone(value), {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  })
+                }
                 placeholder="연락처를 입력해주세요."
                 className="mt-2 h-11 px-4"
+                inputMode="numeric"
+                maxLength={13}
               />
+              {errors.phone ? (
+                <p className="text-xs text-red-600">{errors.phone.message}</p>
+              ) : null}
 
               <div>
                 <FieldLabel required>비밀번호</FieldLabel>
                 <TextInput
+                  value={watch("password")}
+                  onValueChange={(value) =>
+                    setValue("password", value.replace(/\D/g, "").slice(0, 8), {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    })
+                  }
                   type="password"
                   placeholder="글 조회 시 필요한 비밀번호입니다."
                   className="mt-2 h-11 px-4"
+                  inputMode="numeric"
+                  maxLength={8}
                 />
+                {errors.password ? (
+                  <p className="mt-2 text-xs text-red-600">{errors.password.message}</p>
+                ) : null}
                 <p className="mt-2 text-xs text-text-muted">
                   문의 내용 확인 시 필요합니다.
                 </p>
@@ -162,21 +215,36 @@ export default function HomePage() {
                 <p className="text-xs font-medium text-text-main">연령대</p>
                 <div className="mt-2 flex flex-wrap gap-5 text-sm text-text-main">
                   <RadioOption
-                    checked={false}
+                    checked={watch("age") === "20"}
                     name="home-age"
-                    onChange={() => {}}
+                    onChange={() =>
+                      setValue("age", "20", {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
                     label="20대"
                   />
                   <RadioOption
-                    checked={false}
+                    checked={watch("age") === "30"}
                     name="home-age"
-                    onChange={() => {}}
+                    onChange={() =>
+                      setValue("age", "30", {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
                     label="30대"
                   />
                   <RadioOption
-                    checked={false}
+                    checked={watch("age") === "40"}
                     name="home-age"
-                    onChange={() => {}}
+                    onChange={() =>
+                      setValue("age", "40", {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
                     label="40대"
                   />
                 </div>
@@ -188,15 +256,25 @@ export default function HomePage() {
                 </p>
                 <div className="mt-2 flex flex-wrap gap-5 text-sm text-text-main">
                   <RadioOption
-                    checked={false}
+                    checked={watch("interiorType") === "residential"}
                     name="home-interior-type"
-                    onChange={() => {}}
+                    onChange={() =>
+                      setValue("interiorType", "residential", {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
                     label="주거"
                   />
                   <RadioOption
-                    checked={false}
+                    checked={watch("interiorType") === "commercial"}
                     name="home-interior-type"
-                    onChange={() => {}}
+                    onChange={() =>
+                      setValue("interiorType", "commercial", {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
                     label="상업"
                   />
                 </div>
@@ -204,32 +282,46 @@ export default function HomePage() {
 
               <FieldLabel>평수</FieldLabel>
               <TextInput
-                type="text"
+                {...register("area")}
                 placeholder="예: 32평"
                 className="mt-2 h-11 px-4"
               />
 
               <FieldLabel>입주 예상 날짜</FieldLabel>
               <TextInput
-                type="text"
-                placeholder="예: 2025년 3월"
+                {...register("moveInDate")}
+                type="date"
                 className="mt-2 h-11 px-4"
               />
 
               <FieldLabel>원하는 공사</FieldLabel>
               <TextArea
+                {...register("workRequest")}
                 placeholder="원하시는 공사 내용을 입력해주세요."
                 className="mt-2 min-h-28 px-4 py-3"
               />
 
               <FieldLabel>기타 요구사항</FieldLabel>
               <TextArea
+                {...register("content")}
                 placeholder="기타 요구사항을 입력해주세요."
                 className="mt-2 min-h-28 px-4 py-3"
               />
 
-              <Button type="button" full className="mt-2 h-12 rounded-lg">
-                문의 등록
+              {homeInquiryState.submitErrorMessage ? (
+                <p className="text-sm text-red-600">{homeInquiryState.submitErrorMessage}</p>
+              ) : null}
+              {homeInquiryState.submitSuccessMessage ? (
+                <p className="text-sm text-green-600">{homeInquiryState.submitSuccessMessage}</p>
+              ) : null}
+
+              <Button
+                type="submit"
+                full
+                className="mt-2 h-12 rounded-lg"
+                disabled={homeInquiryState.isSubmitting}
+              >
+                {homeInquiryState.isSubmitting ? "등록 중..." : "문의 등록"}
               </Button>
             </form>
           </div>

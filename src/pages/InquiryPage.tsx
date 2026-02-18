@@ -1,40 +1,21 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import InquiryFormSection from "../components/inquiry/InquiryFormSection";
 import InquiryListSection from "../components/inquiry/InquiryListSection";
-import { initialInquiries } from "../mocks/mockInquiryData";
-import {
-  initialForm,
-  type InquiryFormValues,
-  type InquiryItem,
-} from "../components/inquiry/types";
+import { useInquiryCreate } from "../components/inquiry/hooks/useInquiryCreate";
+import { useInquiryDetail } from "../components/inquiry/hooks/useInquiryDetail";
+import { useInquiryList } from "../components/inquiry/hooks/useInquiryList";
+import { parseErrorMessage } from "../shared/error";
 
 export default function InquiryPage() {
   const [isWriting, setIsWriting] = useState(false);
-  const [form, setForm] = useState<InquiryFormValues>(initialForm);
-  const [inquiries, setInquiries] = useState<InquiryItem[]>(initialInquiries);
-
-  const updateForm = <K extends keyof InquiryFormValues>(
-    key: K,
-    value: InquiryFormValues[K],
-  ) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const nextItem: InquiryItem = {
-      id: Date.now(),
-      title: form.workRequest || "새 문의",
-      name: form.name,
-      createdAt: new Date().toLocaleDateString("ko-KR"),
-      hasReply: false,
-    };
-
-    setInquiries((prev) => [nextItem, ...prev]);
-    setForm(initialForm);
-    setIsWriting(false);
-  };
+  const inquiryListState = useInquiryList();
+  const inquiryDetailState = useInquiryDetail();
+  const inquiryCreateState = useInquiryCreate({
+    onCreated: () => {
+      setIsWriting(false);
+      inquiryListState.resetToFirstPage();
+    },
+  });
 
   return (
     <div className="bg-surface-muted">
@@ -55,22 +36,56 @@ export default function InquiryPage() {
           <div className="space-y-2">
             <button
               type="button"
-              onClick={() => setIsWriting(false)}
+              onClick={() => {
+                inquiryCreateState.setSubmitErrorMessage("");
+                setIsWriting(false);
+              }}
               className="inline-flex items-center px-1 text-sm font-medium text-text-main transition hover:text-text-muted"
             >
               ← 뒤로가기
             </button>
             <InquiryFormSection
-              form={form}
-              onChange={updateForm}
-              onCancel={() => setIsWriting(false)}
-              onSubmit={onSubmit}
+              form={inquiryCreateState.form}
+              onCancel={() => {
+                inquiryCreateState.setSubmitErrorMessage("");
+                setIsWriting(false);
+              }}
+              onSubmitValues={inquiryCreateState.onSubmitValues}
+              submitErrorMessage={inquiryCreateState.submitErrorMessage}
+              isSubmitting={inquiryCreateState.isSubmitting}
             />
           </div>
         ) : (
           <InquiryListSection
-            inquiries={inquiries}
-            onWrite={() => setIsWriting(true)}
+            inquiries={inquiryListState.pagedInquiries}
+            totalCount={inquiryListState.inquiries.length}
+            currentPage={inquiryListState.currentPage}
+            totalPages={inquiryListState.totalPages}
+            onPageChange={(nextPage) => {
+              inquiryListState.setCurrentPage(nextPage);
+              inquiryDetailState.onResetForListChange();
+            }}
+            onSelectDetail={inquiryDetailState.onSelectDetail}
+            selectedInquiryId={inquiryDetailState.selectedInquiryId}
+            selectedDetail={inquiryDetailState.selectedDetail}
+            isPasswordRequired={inquiryDetailState.isPasswordRequired}
+            detailPassword={inquiryDetailState.detailPassword}
+            detailErrorMessage={inquiryDetailState.detailErrorMessage}
+            isDetailLoading={inquiryDetailState.isDetailLoading}
+            onDetailPasswordChange={inquiryDetailState.onDetailPasswordChange}
+            onVerifyDetail={inquiryDetailState.onVerifyDetail}
+            onCloseDetail={inquiryDetailState.onCloseDetail}
+            onWrite={() => {
+              inquiryListState.resetToFirstPage();
+              inquiryDetailState.onResetForListChange();
+              setIsWriting(true);
+            }}
+            isLoading={inquiryListState.inquiryListQuery.isLoading}
+            errorMessage={
+              inquiryListState.inquiryListQuery.isError
+                ? parseErrorMessage(inquiryListState.inquiryListQuery.error)
+                : ""
+            }
           />
         )}
       </section>

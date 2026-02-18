@@ -1,55 +1,98 @@
-import type { FormEvent } from "react";
+import type { UseFormReturn } from "react-hook-form";
 import Button from "../ui/Button";
 import FieldLabel from "../ui/FieldLabel";
 import RadioOption from "../ui/RadioOption";
 import TextArea from "../ui/TextArea";
 import TextInput from "../ui/TextInput";
-import type { InquiryFormValues } from "./types";
+import type { InquiryFormValues } from "./inquiryFormSchema";
 
 interface InquiryFormSectionProps {
-  form: InquiryFormValues;
-  onChange: <K extends keyof InquiryFormValues>(
-    key: K,
-    value: InquiryFormValues[K],
-  ) => void;
+  form: UseFormReturn<InquiryFormValues>;
+  onSubmitValues: (values: InquiryFormValues) => void;
   onCancel: () => void;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  submitErrorMessage?: string;
+  isSubmitting?: boolean;
 }
 
 export default function InquiryFormSection({
   form,
-  onChange,
+  onSubmitValues,
   onCancel,
-  onSubmit,
+  submitErrorMessage = "",
+  isSubmitting = false,
 }: InquiryFormSectionProps) {
+  const {
+    register,
+    watch,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = form;
+
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 3) {
+      return digits;
+    }
+    if (digits.length <= 7) {
+      return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    }
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  };
+
   return (
     <div className="mx-auto max-w-280 rounded-2xl border border-line bg-card p-5 shadow-sm md:p-6">
-      <form className="grid gap-4 lg:grid-cols-2" onSubmit={onSubmit}>
+      <form className="grid gap-4 lg:grid-cols-2" onSubmit={handleSubmit(onSubmitValues)}>
         <div className="space-y-1">
           <FieldLabel label="이름" required />
           <TextInput
-            value={form.name}
-            onValueChange={(value) => onChange("name", value)}
+            {...register("name")}
             placeholder="이름을 입력해주세요"
+            maxLength={10}
             required
           />
+          {errors.name ? (
+            <p className="text-xs text-red-600">{errors.name.message}</p>
+          ) : null}
 
           <FieldLabel label="연락처" required />
           <TextInput
-            value={form.phone}
-            onValueChange={(value) => onChange("phone", value)}
+            value={watch("phone")}
+            onValueChange={(value) =>
+              setValue("phone", formatPhone(value), {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              })
+            }
             placeholder="연락처를 입력해주세요"
+            inputMode="numeric"
+            maxLength={13}
             required
           />
+          {errors.phone ? (
+            <p className="text-xs text-red-600">{errors.phone.message}</p>
+          ) : null}
 
           <FieldLabel label="비밀번호" required />
           <TextInput
-            value={form.password}
-            onValueChange={(value) => onChange("password", value)}
+            value={watch("password")}
+            onValueChange={(value) =>
+              setValue("password", value.replace(/\D/g, "").slice(0, 8), {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              })
+            }
             placeholder="글 조회 시 필요한 비밀번호"
             type="password"
+            inputMode="numeric"
+            maxLength={8}
             required
           />
+          {errors.password ? (
+            <p className="text-xs text-red-600">{errors.password.message}</p>
+          ) : null}
           <p className=" text-xs text-text-muted">
             문의 내용 확인 시 필요합니다
           </p>
@@ -57,38 +100,42 @@ export default function InquiryFormSection({
           <FieldLabel label="연령대" />
           <div className="flex flex-wrap gap-5 text-sm text-text-main">
             <RadioOption
-              checked={form.age === "20"}
+              checked={watch("age") === "20"}
               label="20대"
               name="age"
-              onChange={() => onChange("age", "20")}
+              onChange={() => setValue("age", "20", { shouldDirty: true, shouldValidate: true })}
             />
             <RadioOption
-              checked={form.age === "30"}
+              checked={watch("age") === "30"}
               label="30대"
               name="age"
-              onChange={() => onChange("age", "30")}
+              onChange={() => setValue("age", "30", { shouldDirty: true, shouldValidate: true })}
             />
             <RadioOption
-              checked={form.age === "40"}
+              checked={watch("age") === "40"}
               label="40대"
               name="age"
-              onChange={() => onChange("age", "40")}
+              onChange={() => setValue("age", "40", { shouldDirty: true, shouldValidate: true })}
             />
           </div>
 
           <FieldLabel label="인테리어 종류" />
           <div className="flex flex-wrap gap-5 text-sm text-text-main">
             <RadioOption
-              checked={form.interiorType === "residential"}
+              checked={watch("interiorType") === "residential"}
               label="주거"
               name="interiorType"
-              onChange={() => onChange("interiorType", "residential")}
+              onChange={() =>
+                setValue("interiorType", "residential", { shouldDirty: true, shouldValidate: true })
+              }
             />
             <RadioOption
-              checked={form.interiorType === "commercial"}
+              checked={watch("interiorType") === "commercial"}
               label="상업"
               name="interiorType"
-              onChange={() => onChange("interiorType", "commercial")}
+              onChange={() =>
+                setValue("interiorType", "commercial", { shouldDirty: true, shouldValidate: true })
+              }
             />
           </div>
         </div>
@@ -96,32 +143,32 @@ export default function InquiryFormSection({
         <div className="space-y-1">
           <FieldLabel label="평수" />
           <TextInput
-            value={form.area}
-            onValueChange={(value) => onChange("area", value)}
+            {...register("area")}
             placeholder="예: 32평"
           />
 
           <FieldLabel label="입주 예상 날짜" />
           <TextInput
-            value={form.moveInDate}
-            onValueChange={(value) => onChange("moveInDate", value)}
-            placeholder="예: 2025년 3월"
+            {...register("moveInDate")}
+            type="date"
           />
 
           <FieldLabel label="원하는 공사" />
           <TextArea
-            value={form.workRequest}
-            onValueChange={(value) => onChange("workRequest", value)}
+            {...register("workRequest")}
             placeholder="원하시는 공사 내용을 입력해주세요"
           />
 
           <FieldLabel label="기타 요구사항" />
           <TextArea
-            value={form.content}
-            onValueChange={(value) => onChange("content", value)}
+            {...register("content")}
             placeholder="기타 요구사항을 입력해주세요"
           />
         </div>
+
+        {submitErrorMessage ? (
+          <p className="text-sm text-red-600 lg:col-span-2">{submitErrorMessage}</p>
+        ) : null}
 
         <div className="flex justify-center gap-3 pt-1 lg:col-span-2">
           <Button
@@ -129,14 +176,16 @@ export default function InquiryFormSection({
             onClick={onCancel}
             variant="outline"
             className="h-11 min-w-28 border-line-strong px-5 hover:bg-card-soft"
+            disabled={isSubmitting}
           >
             취소
           </Button>
           <Button
             type="submit"
             className="h-11 min-w-36 px-7"
+            disabled={isSubmitting}
           >
-            문의 등록
+            {isSubmitting ? "등록 중..." : "문의 등록"}
           </Button>
         </div>
       </form>
