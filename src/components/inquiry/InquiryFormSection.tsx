@@ -78,7 +78,7 @@ export default function InquiryFormSection({
           <TextInput
             value={watch("password")}
             onValueChange={(value) =>
-              setValue("password", value.replace(/\D/g, "").slice(0, 8), {
+              setValue("password", value, {
                 shouldDirty: true,
                 shouldTouch: true,
                 shouldValidate: true,
@@ -86,8 +86,7 @@ export default function InquiryFormSection({
             }
             placeholder="글 조회 시 필요한 비밀번호"
             type="password"
-            inputMode="numeric"
-            maxLength={8}
+            maxLength={50}
             required
           />
           {errors.password ? (

@@ -1,6 +1,7 @@
 import type { InquiryItem } from "./types";
 import type { InquiryDetail } from "../../api/types";
 import Button from "../ui/Button";
+import Skeleton from "../ui/Skeleton";
 import StatusBadge from "../ui/StatusBadge";
 import TextInput from "../ui/TextInput";
 
@@ -55,11 +56,23 @@ export default function InquiryListSection({
       </div>
 
       <div className="space-y-3">
-        {isLoading ? (
-          <p className="rounded-xl border border-line bg-card px-5 py-4 text-sm text-text-muted shadow-sm">
-            문의 목록을 불러오는 중입니다.
-          </p>
-        ) : null}
+        {isLoading
+          ? Array.from({ length: 5 }, (_, index) => (
+              <article
+                key={`inquiry-skeleton-${index}`}
+                className="rounded-xl border border-line bg-card px-5 py-4 shadow-sm"
+                aria-hidden
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <Skeleton className="h-6 w-2/3" />
+                  <Skeleton className="h-6 w-18 rounded-full" />
+                </div>
+                <div className="mt-3">
+                  <Skeleton className="h-4 w-28" />
+                </div>
+              </article>
+            ))
+          : null}
         {!isLoading && errorMessage ? (
           <p className="rounded-xl border border-line bg-card px-5 py-4 text-sm text-red-600 shadow-sm">
             {errorMessage}
@@ -88,7 +101,9 @@ export default function InquiryListSection({
               }}
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-lg font-semibold text-text-main">{item.title}</p>
+                <p className="text-lg font-semibold text-text-main">
+                  {item.title}
+                </p>
                 <StatusBadge tone={item.hasReply ? "success" : "warn"}>
                   {item.hasReply ? "답변완료" : "대기중"}
                 </StatusBadge>
@@ -117,31 +132,42 @@ export default function InquiryListSection({
                         닫기
                       </Button>
                     </div>
-                    <div>이름: {selectedDetail.name}</div>
-                    <div>연락처: {selectedDetail.phone}</div>
-                    <div>연령대: {selectedDetail.age || "-"}</div>
-                    <div>
-                      인테리어 종류:{" "}
-                      {selectedDetail.interior_type === "residential"
-                        ? "주거"
-                        : selectedDetail.interior_type === "commercial"
-                          ? "상업"
-                          : "-"}
+                    <div className="rounded-md border border-line bg-card px-3 py-2">
+                      <div>이름: {selectedDetail.name}</div>
+                      <div>연락처: {selectedDetail.phone}</div>
+                      <div>연령대: {selectedDetail.age || "-"}</div>
+                      <div>
+                        인테리어 종류:{" "}
+                        {selectedDetail.interior_type === "residential"
+                          ? "주거"
+                          : selectedDetail.interior_type === "commercial"
+                            ? "상업"
+                            : "-"}
+                      </div>
+                      <div>평수: {selectedDetail.area || "-"}</div>
+                      <div>
+                        입주 예정일: {selectedDetail.move_in_date || "-"}
+                      </div>
+                      <div>
+                        원하는 공사: {selectedDetail.work_request || "-"}
+                      </div>
+                      <div>기타 요구사항: {selectedDetail.content || "-"}</div>
                     </div>
-                    <div>평수: {selectedDetail.area || "-"}</div>
-                    <div>입주 예정일: {selectedDetail.move_in_date || "-"}</div>
-                    <div>원하는 공사: {selectedDetail.work_request || "-"}</div>
-                    <div>기타 요구사항: {selectedDetail.content || "-"}</div>
                     <div className="pt-2 font-medium">답변</div>
                     {selectedDetail.comments.length === 0 ? (
                       <p className="text-text-muted">등록된 답변이 없습니다.</p>
                     ) : (
                       <div className="space-y-2">
                         {selectedDetail.comments.map((comment) => (
-                          <article key={comment.id} className="rounded-md border border-line bg-card px-3 py-2">
+                          <article
+                            key={comment.id}
+                            className="rounded-md border border-line bg-card px-3 py-2"
+                          >
                             <div>{comment.content}</div>
                             <div className="mt-1 text-xs text-text-muted">
-                              {new Date(comment.created_at).toLocaleString("ko-KR")}
+                              {new Date(comment.created_at).toLocaleString(
+                                "ko-KR",
+                              )}
                             </div>
                           </article>
                         ))}
@@ -149,7 +175,9 @@ export default function InquiryListSection({
                     )}
                   </div>
                 ) : isDetailLoading && !isPasswordRequired ? (
-                  <p className="text-sm text-text-muted">세션 인증 여부를 확인하는 중입니다.</p>
+                  <p className="text-sm text-text-muted">
+                    세션 인증 여부를 확인하는 중입니다.
+                  </p>
                 ) : (
                   <div className="space-y-3">
                     <p className="text-sm text-text-muted">
@@ -158,11 +186,10 @@ export default function InquiryListSection({
                     <div className="flex flex-col gap-2 md:flex-row">
                       <TextInput
                         value={detailPassword}
-                        onValueChange={(value) => onDetailPasswordChange(value.replace(/\D/g, "").slice(0, 8))}
-                        placeholder="비밀번호(숫자만)"
+                        onValueChange={onDetailPasswordChange}
+                        placeholder="비밀번호"
                         type="password"
-                        inputMode="numeric"
-                        maxLength={8}
+                        maxLength={50}
                         className="md:max-w-64"
                       />
                       <Button
@@ -183,7 +210,9 @@ export default function InquiryListSection({
                       </Button>
                     </div>
                     {detailErrorMessage ? (
-                      <p className="text-sm text-red-600">{detailErrorMessage}</p>
+                      <p className="text-sm text-red-600">
+                        {detailErrorMessage}
+                      </p>
                     ) : null}
                   </div>
                 )}
