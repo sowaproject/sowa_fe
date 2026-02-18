@@ -70,52 +70,52 @@ const publicApi = {
 
 const adminApi = {
   getStats: async () => {
-    const { data } = await apiClient.get<DashboardStats>("/api/admin/stats/");
+    const { data } = await apiClient.get<DashboardStats>("/api/dashboard-sowa/stats/");
     return data;
   },
 
   login: async (payload: LoginRequest) => {
-    const { data } = await apiClient.post<MessageResponse>("/api/admin/login/", payload);
+    const { data } = await apiClient.post<MessageResponse>("/api/dashboard-sowa/login/", payload);
     return data;
   },
 
   logout: async () => {
-    const { data } = await apiClient.post<MessageResponse>("/api/admin/logout/");
+    const { data } = await apiClient.post<MessageResponse>("/api/dashboard-sowa/logout/");
     return data;
   },
 
   listCategories: async () => {
-    const { data } = await apiClient.get<Category[]>("/api/admin/category/");
+    const { data } = await apiClient.get<Category[]>("/api/dashboard-sowa/category/");
     return data;
   },
 
   createCategory: async (payload: CategoryRequest) => {
-    const { data } = await apiClient.post<Category>("/api/admin/category/", payload);
+    const { data } = await apiClient.post<Category>("/api/dashboard-sowa/category/", payload);
     return data;
   },
 
   updateCategory: async (id: number, payload: CategoryRequest) => {
-    const { data } = await apiClient.put<Category>(`/api/admin/category/${id}/`, payload);
+    const { data } = await apiClient.put<Category>(`/api/dashboard-sowa/category/${id}/`, payload);
     return data;
   },
 
   deleteCategory: async (id: number) => {
-    await apiClient.delete(`/api/admin/category/${id}/`);
+    await apiClient.delete(`/api/dashboard-sowa/category/${id}/`);
   },
 
   listPortfolio: async () => {
-    const { data } = await apiClient.get<PortfolioImage[]>("/api/admin/portfolio/");
+    const { data } = await apiClient.get<PortfolioImage[]>("/api/dashboard-sowa/portfolio/");
     return data;
   },
 
   getPortfolio: async (id: number) => {
-    const { data } = await apiClient.get<PortfolioImage>(`/api/admin/portfolio/${id}/`);
+    const { data } = await apiClient.get<PortfolioImage>(`/api/dashboard-sowa/portfolio/${id}/`);
     return data;
   },
 
   createPortfolio: async (payload: PortfolioImageRequest) => {
     const body = toFormData(payload);
-    const { data } = await apiClient.post<PortfolioImage>("/api/admin/portfolio/", body, {
+    const { data } = await apiClient.post<PortfolioImage>("/api/dashboard-sowa/portfolio/", body, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return data;
@@ -123,49 +123,49 @@ const adminApi = {
 
   updatePortfolio: async (id: number, payload: PortfolioImageRequest) => {
     const body = toFormData(payload);
-    const { data } = await apiClient.put<PortfolioImage>(`/api/admin/portfolio/${id}/`, body, {
+    const { data } = await apiClient.put<PortfolioImage>(`/api/dashboard-sowa/portfolio/${id}/`, body, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return data;
   },
 
   deletePortfolio: async (id: number) => {
-    await apiClient.delete(`/api/admin/portfolio/${id}/`);
+    await apiClient.delete(`/api/dashboard-sowa/portfolio/${id}/`);
   },
 
   listInquiry: async () => {
-    const { data } = await apiClient.get<InquiryListItem[]>("/api/admin/inquiry/");
+    const { data } = await apiClient.get<InquiryListItem[]>("/api/dashboard-sowa/inquiry/");
     return data;
   },
 
   getInquiry: async (id: number) => {
-    const { data } = await apiClient.get<InquiryDetail>(`/api/admin/inquiry/${id}/`);
+    const { data } = await apiClient.get<InquiryDetail>(`/api/dashboard-sowa/inquiry/${id}/`);
     return data;
   },
 
   deleteInquiry: async (id: number) => {
-    await apiClient.delete(`/api/admin/inquiry/${id}/`);
+    await apiClient.delete(`/api/dashboard-sowa/inquiry/${id}/`);
   },
 
   createComment: async (id: number, content: string) => {
-    const { data } = await apiClient.post<Comment>(`/api/admin/inquiry/${id}/comment/`, {
+    const { data } = await apiClient.post<Comment>(`/api/dashboard-sowa/inquiry/${id}/comment/`, {
       content,
     });
     return data;
   },
 
   deleteComment: async (id: number) => {
-    await apiClient.delete(`/api/admin/comment/${id}/`);
+    await apiClient.delete(`/api/dashboard-sowa/comment/${id}/`);
   },
 
   getSettings: async () => {
-    const { data } = await apiClient.get<SiteSettings>("/api/admin/settings/");
+    const { data } = await apiClient.get<SiteSettings>("/api/dashboard-sowa/settings/");
     return data;
   },
 
   updateSettings: async (payload: SiteSettingsRequest) => {
     const body = toFormData(payload);
-    const { data } = await apiClient.put<SiteSettings>("/api/admin/settings/", body, {
+    const { data } = await apiClient.put<SiteSettings>("/api/dashboard-sowa/settings/", body, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return data;
