@@ -1,4 +1,5 @@
 import Skeleton from "../ui/Skeleton";
+import { resolveAssetUrl } from "../../shared/assetUrl";
 
 interface ProjectCardProps {
   title: string;
@@ -10,9 +11,11 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ title, category, area, year, image, summary }: ProjectCardProps) {
+  const imageSrc = resolveAssetUrl(image);
+
   return (
     <article className="overflow-hidden rounded-2xl border border-line bg-card shadow-sm">
-      <img src={image} alt={title} className="h-52 w-full object-cover" />
+      <img src={imageSrc} alt={title} className="h-52 w-full object-cover" />
       <div className="p-5">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold tracking-[0.08em] text-text-muted">{category}</p>

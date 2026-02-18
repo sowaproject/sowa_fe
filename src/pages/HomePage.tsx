@@ -12,6 +12,7 @@ import RadioOption from "../components/ui/RadioOption";
 import TextArea from "../components/ui/TextArea";
 import TextInput from "../components/ui/TextInput";
 import { useInquiryCreate } from "../components/inquiry/hooks/useInquiryCreate";
+import { resolveAssetUrl } from "../shared/assetUrl";
 
 export default function HomePage() {
   const settingsQuery = useQuery({
@@ -57,7 +58,7 @@ export default function HomePage() {
     settingsQuery.data?.hero_subtitle ||
     "감각적인 레이아웃과 균형 잡힌 디테일로 당신의 라이프스타일에 맞는 공간을 제안합니다.";
   const heroImage =
-    settingsQuery.data?.hero_image ||
+    resolveAssetUrl(settingsQuery.data?.hero_image) ||
     "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80";
 
   return (

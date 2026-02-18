@@ -22,6 +22,7 @@ import Select from "../ui/Select";
 import TextArea from "../ui/TextArea";
 import TextInput from "../ui/TextInput";
 import type { PortfolioEditorMode, PortfolioFormState } from "./types";
+import { resolveAssetUrl } from "../../shared/assetUrl";
 
 interface AdminPortfolioTabProps {
   portfolioList: PortfolioImage[];
@@ -257,6 +258,7 @@ function SortablePortfolioCard({
     transition,
     isDragging,
   } = useSortable({ id: item.id });
+  const previewImageSrc = resolveAssetUrl(item.image);
 
   return (
     <article
@@ -277,9 +279,9 @@ function SortablePortfolioCard({
       </button>
 
       <div className="aspect-4/3 bg-surface">
-        {item.image ? (
+        {previewImageSrc ? (
           <img
-            src={item.image}
+            src={previewImageSrc}
             alt={item.title}
             className="h-full w-full object-cover"
           />

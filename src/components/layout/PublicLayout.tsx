@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import logoImage from "../../assets/sowa_icon.png";
 import footerLogoImage from "../../assets/sowa_ic_white.png";
 import { sowaApi } from "../../api/sowaApi";
+import { resolveAssetUrl } from "../../shared/assetUrl";
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
   `text-sm font-medium tracking-[0.02em] transition-colors ${
@@ -21,8 +22,9 @@ export default function PublicLayout() {
     queryFn: sowaApi.public.getSettings,
   });
   const siteTitle = settingsQuery.data?.site_title || "SOWA";
-  const logoSrc = settingsQuery.data?.logo_image || logoImage;
-  const footerLogoSrc = settingsQuery.data?.logo_image || footerLogoImage;
+  const logoSrc = resolveAssetUrl(settingsQuery.data?.logo_image) || logoImage;
+  const footerLogoSrc =
+    resolveAssetUrl(settingsQuery.data?.logo_image) || footerLogoImage;
 
   return (
     <div className="flex min-h-screen flex-col bg-surface text-text-main">
@@ -70,7 +72,7 @@ export default function PublicLayout() {
           </div>
 
           <div className="space-y-1 text-center md:text-right">
-            <p>이창훈</p>
+            <p>Principal designer : 이창훈</p>
             <p>ech0701@naver.com</p>
             <p>+82 10-9457-7283</p>
             <p>서울특별시, 강남구 논현동 123-3번지, 1층</p>
