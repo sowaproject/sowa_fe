@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import type { CompanyHistory, TeamMember } from "../../api/types";
+import { getMemberCareer } from "../../shared/memberCareer";
 import Button from "../ui/Button";
 import FieldLabel from "../ui/FieldLabel";
 import Select from "../ui/Select";
@@ -67,7 +68,7 @@ export default function AdminStoryTab({
       {/* ─── 연혁 ─── */}
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-text-main">연혁</h3>
+          <h3 data-ui-heading className="text-lg font-semibold text-text-main">연혁</h3>
           <Button type="button" className="h-9 px-4 text-sm" onClick={onOpenCreateHistory}>
             연혁 추가
           </Button>
@@ -157,7 +158,7 @@ export default function AdminStoryTab({
       {/* ─── 팀원 ─── */}
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-text-main">팀원</h3>
+          <h3 data-ui-heading className="text-lg font-semibold text-text-main">팀원</h3>
           <Button type="button" className="h-9 px-4 text-sm" onClick={onOpenCreateMember}>
             팀원 추가
           </Button>
@@ -204,16 +205,6 @@ export default function AdminStoryTab({
                 type="number"
                 value={memberForm.order}
                 onChange={(e) => onChangeMemberForm({ ...memberForm, order: e.target.value })}
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <FieldLabel>학력</FieldLabel>
-              <TextArea
-                className="mt-2 min-h-20"
-                placeholder="학력 정보를 입력하세요 (줄바꿈 가능)"
-                value={memberForm.education}
-                onChange={(e) => onChangeMemberForm({ ...memberForm, education: e.target.value })}
               />
             </div>
 
@@ -275,14 +266,9 @@ export default function AdminStoryTab({
                     </Button>
                   </div>
                 </div>
-                {(member.education || member.career) && (
+                {getMemberCareer(member) && (
                   <div className="mt-3 space-y-1 border-t border-line pt-3">
-                    {member.education && (
-                      <p className="text-xs text-text-muted line-clamp-2">학력: {member.education}</p>
-                    )}
-                    {member.career && (
-                      <p className="text-xs text-text-muted line-clamp-2">경력: {member.career}</p>
-                    )}
+                    <p className="text-xs text-text-muted line-clamp-2">경력: {getMemberCareer(member)}</p>
                   </div>
                 )}
               </div>

@@ -14,15 +14,30 @@ const fieldLabels: Record<string, string> = {
   year: "YEAR",
   location: "LOCATION",
   title: "제목",
+  images: "이미지",
+  category_id: "분류",
+  education: "학력",
+  career: "경력",
+};
+
+const firstErrorMessage = (value: unknown, depth = 0): string | null => {
+  if (typeof value === "string") return value;
+  if (depth > 4 || typeof value !== "object" || value === null) return null;
+  for (const item of Object.values(value)) {
+    const message = firstErrorMessage(item, depth + 1);
+    if (message) return message;
+  }
+  return null;
 };
 
 const parseFieldError = (data: unknown): string | null => {
-  if (typeof data !== "object" || data === null || Array.isArray(data)) {
+  if (Array.isArray(data)) return firstErrorMessage(data);
+  if (typeof data !== "object" || data === null) {
     return null;
   }
 
   for (const [field, value] of Object.entries(data)) {
-    const message = Array.isArray(value) ? value.find((item) => typeof item === "string") : value;
+    const message = firstErrorMessage(value);
     if (typeof message === "string") {
       return `${fieldLabels[field] ?? field}: ${message}`;
     }
@@ -47,6 +62,10 @@ export const parseErrorMessage = (error: unknown): string => {
 
     if (maybeResponse?.status === 400) {
       return parseFieldError(responseData) ?? "입력한 내용을 다시 확인해주세요.";
+    }
+
+    if (maybeResponse?.status === 413) {
+      return "업로드 요청의 용량이 너무 큽니다. 사진을 나눠서 업로드해주세요.";
     }
 
     if (maybeResponse?.status === 401) {

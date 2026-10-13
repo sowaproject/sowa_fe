@@ -1,0 +1,76 @@
+@import "wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.css";
+
+/* Local comparison only. Existing page layout and content stay intact. */
+.sowa-editorial-preview {
+  --color-footer: #3d3833;
+  --color-footer-text: #ede5dd;
+  --font-sans: "Wanted Sans Variable", sans-serif;
+}
+
+.sowa-editorial-preview body,
+.sowa-editorial-preview h1,
+.sowa-editorial-preview h2,
+.sowa-editorial-preview h3 {
+  font-family: "Wanted Sans Variable", sans-serif;
+}
+
+.sowa-editorial-preview h1,
+.sowa-editorial-preview h2,
+.sowa-editorial-preview h3 {
+  letter-spacing: -0.02em;
+}
+
+/* Photo + caption, rather than a floating white card. */
+.sowa-editorial-preview main a[href^="/works/"] {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.sowa-editorial-preview main a[href^="/works/"]:hover {
+  box-shadow: none;
+}
+
+.sowa-editorial-preview main a[href^="/works/"] > img {
+  height: auto;
+  aspect-ratio: 4 / 3;
+  border-radius: 4px;
+}
+
+.sowa-editorial-preview main a[href^="/works/"] > div {
+  padding: 1.25rem 0 0;
+}
+
+/* Separate the two opening sentences instead of joining them on the same line. */
+.sowa-editorial-preview main a[href^="/works/"] .story-copy {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+.sowa-editorial-preview .story-opening-sentence {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-wrap: balance;
+}
+
+.sowa-editorial-preview .story-opening-sentence + .story-opening-sentence {
+  margin-top: 0.5rem;
+}
+
+/* Remove the three English chips, keeping the existing Korean headings. */
+.sowa-editorial-preview main > section span.inline-flex.rounded-full.bg-brand {
+  display: none;
+}
+
+.sowa-editorial-preview main > section:first-child h1,
+.sowa-editorial-preview main > section h2 {
+  margin-top: 0;
+}
+
+/* The image itself remains unchanged; only the 10+ Projects overlay is removed. */
+.sowa-editorial-preview main > section:first-child .absolute.bottom-4.left-4 {
+  display: none;
+}

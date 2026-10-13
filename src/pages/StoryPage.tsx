@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { useQuery } from "@tanstack/react-query";
 import { sowaApi } from "../api/sowaApi";
 import Skeleton from "../components/ui/Skeleton";
+import { getMemberCareer } from "../shared/memberCareer";
 
 export default function StoryPage() {
   const historyQuery = useQuery({
@@ -135,26 +136,14 @@ export default function StoryPage() {
                       {member.name}
                     </h3>
 
-                    {member.education && (
-                      <>
-                        <div className="my-5 border-t border-line" />
-                        <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-subtle">
-                          학력
-                        </p>
-                        <p className="whitespace-pre-line text-sm leading-relaxed text-text-muted">
-                          {member.education}
-                        </p>
-                      </>
-                    )}
-
-                    {member.career && (
+                    {getMemberCareer(member) && (
                       <>
                         <div className="my-5 border-t border-line" />
                         <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-subtle">
                           경력
                         </p>
                         <p className="whitespace-pre-line text-sm leading-relaxed text-text-muted">
-                          {member.career}
+                          {getMemberCareer(member)}
                         </p>
                       </>
                     )}

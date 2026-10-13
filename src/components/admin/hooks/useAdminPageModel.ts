@@ -25,6 +25,8 @@ import type {
   TabKey,
 } from "../types";
 import { parseErrorMessage } from "../../../shared/error";
+import { getPortfolioUploadError } from "../../../shared/portfolioUpload";
+import { buildMemberPayload } from "../../../shared/adminFormValues";
 
 const toList = <T,>(value: unknown): T[] => {
   if (Array.isArray(value)) {
@@ -90,7 +92,6 @@ const createEmptyMemberForm = (): MemberFormState => ({
   role: "",
   name: "",
   title: "",
-  education: "",
   career: "",
   order: "0",
 });
@@ -307,7 +308,11 @@ export function useAdminPageModel() {
 
   const deletePortfolioImageMutation = useMutation({
     mutationFn: sowaApi.admin.deletePortfolioImage,
-    onSuccess: () => {
+    onSuccess: (_data, imageId) => {
+      setPortfolioForm((previous) => ({
+        ...previous,
+        existingImages: previous.existingImages.filter((image) => image.id !== imageId),
+      }));
       showSuccess("이미지 삭제 완료");
       portfolioQuery.refetch();
     },
@@ -513,6 +518,12 @@ export function useAdminPageModel() {
   const submitPortfolioCreate = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const uploadError = getPortfolioUploadError(portfolioForm.images);
+    if (uploadError) {
+      setNotice({ tone: "error", message: uploadError });
+      return;
+    }
+
     if (!portfolioForm.title.trim()) {
       setNotice({ tone: "error", message: "포트폴리오 생성은 제목이 필수입니다." });
       return;
@@ -538,6 +549,11 @@ export function useAdminPageModel() {
   };
 
   const submitPortfolioUpdate = () => {
+    const uploadError = getPortfolioUploadError(portfolioForm.images);
+    if (uploadError) {
+      setNotice({ tone: "error", message: uploadError });
+      return;
+    }
     if (!portfolioForm.id) {
       setNotice({ tone: "error", message: "수정할 포트폴리오 ID를 입력해주세요." });
       return;
@@ -599,14 +615,7 @@ export function useAdminPageModel() {
       return;
     }
 
-    const payload = {
-      role: memberForm.role as TeamMember["role"],
-      name: memberForm.name.trim(),
-      title: memberForm.title.trim() || undefined,
-      education: memberForm.education.trim() || undefined,
-      career: memberForm.career.trim() || undefined,
-      order: Number(memberForm.order || "0"),
-    };
+    const payload = buildMemberPayload(memberForm);
 
     if (memberEditorMode === "edit") {
       if (!memberEditId) {

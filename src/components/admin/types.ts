@@ -51,7 +51,6 @@ export interface MemberFormState {
   role: string;
   name: string;
   title: string;
-  education: string;
   career: string;
   order: string;
 }

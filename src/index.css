@@ -1,10 +1,71 @@
 @import "tailwindcss";
+@import "@fontsource-variable/noto-serif-kr";
+@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 
 html {
   overflow-y: scroll;
 }
 
+@layer base {
+  body {
+    font-family: "Pretendard Variable", sans-serif;
+  }
+
+  h1:not([data-ui-heading]),
+  h2:not([data-ui-heading]),
+  h3:not([data-ui-heading]) {
+    font-family: "Noto Serif KR Variable", serif;
+    letter-spacing: -0.025em;
+  }
+}
+
+.story-copy {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.project-card-title {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.project-carousel {
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  touch-action: pan-y;
+}
+
+.project-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.project-carousel-item {
+  flex: 0 0 88%;
+}
+
+@media (min-width: 640px) {
+  .project-carousel-item {
+    flex-basis: 68%;
+  }
+}
+
+@media (min-width: 768px) {
+  .project-carousel-item {
+    flex-basis: calc((100% - 1.25rem) / 2);
+  }
+}
+
+@media (min-width: 1280px) {
+  .project-carousel-item {
+    flex-basis: calc((100% - 2.5rem) / 3);
+  }
+}
+
 @theme {
+  --font-sans: "Pretendard Variable", sans-serif;
+  --font-serif: "Noto Serif KR Variable", serif;
   --color-brand: #e6daca;
   --color-brand-hover: #d8c9b8;
   --color-brand-border: #d9c8b8;

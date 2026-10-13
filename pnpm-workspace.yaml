@@ -1,0 +1,6 @@
+allowBuilds:
+  esbuild: set this to true or false
+# Build-tool security patches within their existing compatible major versions.
+overrides:
+  browserslist: 4.29.3
+  baseline-browser-mapping: 2.11.26

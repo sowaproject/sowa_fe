@@ -10,6 +10,7 @@ import AdminStoryTab from "../components/admin/AdminStoryTab";
 import { useAdminPageModel } from "../components/admin/hooks/useAdminPageModel";
 import Skeleton from "../components/ui/Skeleton";
 import { useNavigate } from "react-router";
+import { getMemberCareer } from "../shared/memberCareer";
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -139,7 +140,7 @@ export default function AdminPage() {
         <div className="mx-auto flex w-full max-w-360 flex-col gap-4 px-6 py-7 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.14em] text-text-subtle">SOWA Admin Dashboard</p>
-            <h1 className="mt-2 text-3xl font-medium tracking-tight text-text-main md:text-4xl">관리자 페이지</h1>
+            <h1 data-ui-heading className="mt-2 text-3xl font-medium tracking-tight text-text-main md:text-4xl">관리자 페이지</h1>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" className="h-10 px-4" onClick={() => navigate("/")}>
@@ -211,7 +212,11 @@ export default function AdminPage() {
                   parent: category.parent ? String(category.parent) : "",
                 });
               }}
-              onDelete={(id) => deleteCategoryMutation.mutate(id)}
+              onDelete={(id) => {
+                if (window.confirm("카테고리를 삭제할까요? 하위 카테고리도 삭제되고 연결된 작품의 분류가 해제됩니다.")) {
+                  deleteCategoryMutation.mutate(id);
+                }
+              }}
               onReorder={(nextList) => reorderCategoryMutation.mutate(nextList)}
             />
           ) : null}
@@ -255,13 +260,15 @@ export default function AdminPage() {
                   existingImages: item.images,
                 });
               }}
-              onDelete={(id) => deletePortfolioMutation.mutate(id)}
+              onDelete={(id) => {
+                if (window.confirm("작품을 삭제할까요? 등록된 사진도 함께 삭제되며 복구할 수 없습니다.")) {
+                  deletePortfolioMutation.mutate(id);
+                }
+              }}
               onDeleteImage={(imageId) => {
-                deletePortfolioImageMutation.mutate(imageId);
-                setPortfolioForm((prev) => ({
-                  ...prev,
-                  existingImages: prev.existingImages.filter((img) => img.id !== imageId),
-                }));
+                if (!deletePortfolioImageMutation.isPending && window.confirm("사진을 삭제할까요? 삭제한 사진은 복구할 수 없습니다.")) {
+                  deletePortfolioImageMutation.mutate(imageId);
+                }
               }}
               onReorder={(nextList) => reorderPortfolioMutation.mutate(nextList)}
             />
@@ -298,7 +305,9 @@ export default function AdminPage() {
                   order: String(item.order ?? 0),
                 });
               }}
-              onDeleteHistory={(id) => deleteHistoryMutation.mutate(id)}
+              onDeleteHistory={(id) => {
+                if (window.confirm("이 연혁을 삭제할까요?")) deleteHistoryMutation.mutate(id);
+              }}
               onOpenCreateMember={() => {
                 setMemberEditorMode("create");
                 setMemberEditId(null);
@@ -318,12 +327,13 @@ export default function AdminPage() {
                   role: member.role,
                   name: member.name,
                   title: member.title ?? "",
-                  education: member.education ?? "",
-                  career: member.career ?? "",
+                  career: getMemberCareer(member),
                   order: String(member.order ?? 0),
                 });
               }}
-              onDeleteMember={(id) => deleteMemberMutation.mutate(id)}
+              onDeleteMember={(id) => {
+                if (window.confirm("이 팀원을 삭제할까요?")) deleteMemberMutation.mutate(id);
+              }}
             />
           ) : null}
 
@@ -340,7 +350,9 @@ export default function AdminPage() {
                   setNotice({ tone: "error", message: "삭제할 문의 ID를 입력해주세요." });
                   return;
                 }
-                deleteInquiryMutation.mutate(Number(selectedAdminInquiryId));
+                if (window.confirm("문의를 삭제할까요? 연결된 답변도 함께 삭제되며 복구할 수 없습니다.")) {
+                  deleteInquiryMutation.mutate(Number(selectedAdminInquiryId));
+                }
               }}
               onSelectInquiry={(id) => {
                 setSelectedAdminInquiryId(String(id));
@@ -355,7 +367,9 @@ export default function AdminPage() {
                 }
                 addCommentMutation.mutate({ inquiryId: Number(selectedAdminInquiryId), content: commentText });
               }}
-              onDeleteComment={(id) => deleteCommentMutation.mutate(id)}
+              onDeleteComment={(id) => {
+                if (window.confirm("이 답변을 삭제할까요?")) deleteCommentMutation.mutate(id);
+              }}
             />
           ) : null}
 

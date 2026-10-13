@@ -1,4 +1,5 @@
 import { apiClient, toFormData } from "./client";
+import { portfolioUpdateFormDataOptions } from "../shared/formData";
 import type {
   Category,
   CategoryRequest,
@@ -179,9 +180,7 @@ const adminApi = {
   },
 
   updatePortfolio: async (id: number, payload: PortfolioUpdateRequest) => {
-    const body = toFormData(payload, {
-      preserveEmptyStringKeys: ["year", "location", "area"],
-    });
+    const body = toFormData(payload, portfolioUpdateFormDataOptions);
     const { data } = await apiClient.put<Portfolio>(
       `/api/dashboard-sowa/portfolio/${id}/`,
       body,

@@ -23,6 +23,7 @@ import TextArea from "../ui/TextArea";
 import TextInput from "../ui/TextInput";
 import type { PortfolioEditorMode, PortfolioFormState } from "./types";
 import { resolveAssetUrl } from "../../shared/assetUrl";
+import { getPortfolioUploadError } from "../../shared/portfolioUpload";
 
 interface AdminPortfolioTabProps {
   portfolioList: Portfolio[];
@@ -55,6 +56,7 @@ export default function AdminPortfolioTab({
   onDeleteImage,
   onReorder,
 }: AdminPortfolioTabProps) {
+  const uploadError = getPortfolioUploadError(portfolioForm.images);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
@@ -243,13 +245,23 @@ export default function AdminPortfolioTab({
             <TextInput
               className="mt-2"
               type="file"
-              accept="image/*"
+              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+              aria-describedby={uploadError ? "portfolio-upload-help portfolio-upload-error" : "portfolio-upload-help"}
               multiple
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 const files = Array.from(e.target.files ?? []);
                 onChangeForm({ ...portfolioForm, images: files });
               }}
             />
+            <p id="portfolio-upload-help" className="mt-2 text-xs text-text-muted">
+              JPEG·PNG·WEBP / 한 장 최대 100MB / 한 번에 최대 20장·합계 200MB.
+              작품에 누적 등록하는 총개수는 제한이 없습니다. 해상도는 최대 4,000만 픽셀입니다.
+            </p>
+            {uploadError && (
+              <p id="portfolio-upload-error" role="alert" className="mt-2 text-sm text-rose-700">
+                {uploadError}
+              </p>
+            )}
             {portfolioForm.images.length > 0 && (
               <p className="mt-1 text-xs text-text-muted">
                 {portfolioForm.images.length}장 선택됨:{" "}
@@ -260,7 +272,7 @@ export default function AdminPortfolioTab({
 
           {/* 액션 버튼 */}
           <div className="flex flex-wrap gap-2 md:col-span-2">
-            <Button type="submit" className="h-10 px-4">
+            <Button type="submit" className="h-10 px-4" disabled={Boolean(uploadError)}>
               {portfolioEditorMode === "create" ? "생성" : "수정 저장"}
             </Button>
             {portfolioEditorMode === "edit" && (

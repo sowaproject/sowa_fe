@@ -1,20 +1,34 @@
 import { Link, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { sowaApi } from "../api/sowaApi";
 import { resolveAssetUrl } from "../shared/assetUrl";
 import Skeleton from "../components/ui/Skeleton";
+import { parsePortfolioId } from "../shared/publicPresentation";
+import { getStoryParagraphs } from "../shared/storyText";
 
 export default function PortfolioDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const portfolioId = Number(id);
+  const portfolioId = parsePortfolioId(id);
 
   const query = useQuery({
-    queryKey: ["public-work", portfolioId],
-    queryFn: () => sowaApi.public.getWork(portfolioId),
-    enabled: !Number.isNaN(portfolioId),
+    queryKey: ["public-work", id],
+    queryFn: () => {
+      if (portfolioId === null) throw new Error("Invalid portfolio ID");
+      return sowaApi.public.getWork(portfolioId);
+    },
+    enabled: portfolioId !== null,
+    retry: (failureCount, error) => {
+      const status = isAxiosError(error) ? error.response?.status : undefined;
+      if (status !== undefined && status >= 400 && status < 500) return false;
+      return failureCount < 1;
+    },
   });
 
   const work = query.data;
+  const storyParagraphs = getStoryParagraphs(work?.description ?? "");
+  const notFound = portfolioId === null ||
+    (isAxiosError(query.error) && query.error.response?.status === 404);
 
   return (
     <div className="min-h-screen bg-surface-muted">
@@ -54,17 +68,34 @@ export default function PortfolioDetailPage() {
           </div>
         )}
 
-        {query.isError && (
-          <p className="text-sm text-red-600">
-            프로젝트를 불러오지 못했습니다.
-          </p>
+        {(notFound || query.isError) && (
+          <div role="alert" className="border-t border-line py-10">
+            <h1 data-ui-heading className="text-xl font-medium text-text-main">
+              {notFound ? "프로젝트를 찾을 수 없습니다." : "프로젝트를 불러오지 못했습니다."}
+            </h1>
+            <p className="mt-3 text-sm leading-relaxed text-text-muted">
+              {notFound
+                ? "주소가 잘못되었거나 더 이상 공개되지 않는 프로젝트입니다. 목록에서 다른 프로젝트를 확인해 주세요."
+                : "잠시 후 다시 시도해 주세요. 문제가 계속되면 프로젝트 목록으로 돌아가 주세요."}
+            </p>
+            {!notFound && (
+              <button
+                type="button"
+                disabled={query.isFetching}
+                onClick={() => void query.refetch()}
+                className="mt-5 rounded-md border border-line-strong px-4 py-2 text-sm text-text-main disabled:opacity-50"
+              >
+                {query.isFetching ? "불러오는 중…" : "다시 시도"}
+              </button>
+            )}
+          </div>
         )}
 
         {work && (
           <div className="flex flex-col gap-8 md:flex-row md:gap-16">
             {/* 왼쪽: 개요 */}
             <aside className="md:w-56 md:shrink-0">
-              <div className="md:sticky md:top-24">
+              <div className={storyParagraphs.length === 0 ? "md:sticky md:top-24" : undefined}>
                 <h1 className="text-xl font-medium tracking-[-0.01em] text-text-main md:text-2xl">
                   {work.title}
                 </h1>
@@ -99,10 +130,19 @@ export default function PortfolioDetailPage() {
                     ) : null}
                   </dl>
                 ) : null}
-                {work.description && (
-                  <p className="mt-6 text-sm leading-relaxed text-text-muted">
-                    {work.description}
-                  </p>
+                {storyParagraphs.length > 0 && (
+                  <section aria-labelledby="project-story-title" className="mt-6">
+                    <h2 data-ui-heading id="project-story-title" className="text-xs font-medium tracking-[0.05em] text-text-subtle">
+                      공간 이야기
+                    </h2>
+                    <div className="mt-3 space-y-4">
+                      {storyParagraphs.map((paragraph, index) => (
+                        <p key={index} className="story-copy text-sm leading-[1.85] text-text-muted">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
+                  </section>
                 )}
               </div>
             </aside>

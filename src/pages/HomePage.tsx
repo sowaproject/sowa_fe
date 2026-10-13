@@ -4,11 +4,13 @@ import { sowaApi } from "../api/sowaApi";
 import ProjectCard, {
   ProjectCardSkeleton,
 } from "../components/common/ProjectCard";
+import ProjectCarousel from "../components/common/ProjectCarousel";
 import ButtonLink from "../components/ui/ButtonLink";
 import Chip from "../components/ui/Chip";
 import InquiryFormSection from "../components/inquiry/InquiryFormSection";
 import { useInquiryCreate } from "../components/inquiry/hooks/useInquiryCreate";
 import { resolveAssetUrl } from "../shared/assetUrl";
+import { splitHeroTitle } from "../shared/publicPresentation";
 
 export default function HomePage() {
   const settingsQuery = useQuery({
@@ -47,13 +49,15 @@ export default function HomePage() {
         transition={{ duration: 0.55, ease: "easeOut" }}
         className="mx-auto w-full max-w-310 px-5 pb-20 pt-10 sm:px-6 md:pb-24 md:pt-12 lg:py-14"
       >
-        <div className="grid items-center gap-8 lg:grid-cols-[0.44fr_0.56fr] lg:gap-10">
+        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-10">
           <div>
             <Chip>Interior Design Studio</Chip>
             <h1 className="mt-7 text-4xl font-medium leading-[1.15] text-text-main md:mt-8 md:text-5xl">
-              {heroTitle}
+              {splitHeroTitle(heroTitle).map((line, index) => (
+                <span key={index} className="block">{line}</span>
+              ))}
             </h1>
-            <p className="mt-7 max-w-105 text-base leading-relaxed text-text-muted">
+            <p className="mt-7 text-base leading-relaxed text-text-muted">
               {heroSubtitle}
             </p>
 
@@ -107,7 +111,7 @@ export default function HomePage() {
           </ButtonLink>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <ProjectCarousel>
           {portfolioQuery.isLoading
             ? Array.from({ length: 6 }, (_, index) => (
                 <ProjectCardSkeleton key={`featured-skeleton-${index}`} />
@@ -135,9 +139,10 @@ export default function HomePage() {
               area={project.area ?? undefined}
               image={project.thumbnail}
               summary={project.description}
+              to={`/works/${project.id}`}
             />
           ))}
-        </div>
+        </ProjectCarousel>
 
         <div className="mt-11 text-center">
           <ButtonLink

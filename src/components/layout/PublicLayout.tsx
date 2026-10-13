@@ -6,6 +6,8 @@ import logoImage from "../../assets/sowa_icon.png";
 import footerLogoImage from "../../assets/sowa_ic_white.png";
 import { sowaApi } from "../../api/sowaApi";
 import { resolveAssetUrl } from "../../shared/assetUrl";
+import { preventPublicImageAction } from "../../shared/publicImageProtection";
+import "../../shared/publicImageProtection.css";
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
   `text-sm font-medium tracking-[0.02em] transition-colors ${
@@ -47,7 +49,11 @@ export default function PublicLayout() {
     resolveAssetUrl(settingsQuery.data?.logo_image) || footerLogoImage;
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface text-text-main">
+    <div
+      className="sowa-protected-images flex min-h-screen flex-col bg-surface text-text-main"
+      onContextMenuCapture={preventPublicImageAction}
+      onDragStartCapture={preventPublicImageAction}
+    >
       <header
         className={`sticky top-0 border-b border-line ${
           isMobileMenuOpen ? "z-40 bg-card" : "z-20 bg-card/75 backdrop-blur-sm"
@@ -137,8 +143,8 @@ export default function PublicLayout() {
           </div>
 
           <div className="min-w-0 space-y-1 text-center md:text-right">
-            <p>Principal designer : 이창훈</p>
-            <p>ech0701@naver.com</p>
+            <p>Co-CEOs : 이창훈 김민곤</p>
+            <p>teamsowa@naver.com</p>
             <p>+82 10-9457-7283</p>
             <p className="break-words">서울특별시, 강남구 논현동 123-3번지, 1층</p>
           </div>

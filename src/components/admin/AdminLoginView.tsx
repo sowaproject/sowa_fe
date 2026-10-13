@@ -27,7 +27,7 @@ export default function AdminLoginView({
       <div className="mx-auto w-full max-w-120 space-y-6">
         <section className="rounded-2xl border border-line bg-card p-7 shadow-sm md:p-8">
           <p className="mb-2 text-xs uppercase tracking-[0.14em] text-text-subtle">SOWA Admin</p>
-          <h1 className="text-3xl font-medium tracking-tight text-text-main md:text-4xl">관리자 로그인</h1>
+          <h1 data-ui-heading className="text-3xl font-medium tracking-tight text-text-main md:text-4xl">관리자 로그인</h1>
           <p className="mt-3 text-sm leading-relaxed text-text-muted">
             관리자 페이지는 공개 네비게이션에 노출되지 않으며, <strong>/admin</strong> URL 직접 접근 후
             관리자 인증이 완료된 경우에만 진입 가능합니다.
