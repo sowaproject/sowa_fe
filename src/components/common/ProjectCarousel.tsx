@@ -1,5 +1,5 @@
 import { Children, useEffect, useRef, useState } from "react";
-import type { PointerEvent, ReactNode } from "react";
+import type { MouseEvent, PointerEvent, ReactNode } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 interface ProjectCarouselProps {
@@ -79,7 +79,7 @@ export default function ProjectCarousel({ children }: ProjectCarouselProps) {
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (event.pointerType === "mouse") return;
 
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -96,6 +96,8 @@ export default function ProjectCarousel({ children }: ProjectCarouselProps) {
   };
 
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "mouse") return;
+
     const viewport = viewportRef.current;
     const dragState = dragStateRef.current;
     if (!viewport || !dragState.active || dragState.pointerId !== event.pointerId) {
@@ -112,7 +114,20 @@ export default function ProjectCarousel({ children }: ProjectCarouselProps) {
     viewport.scrollLeft = dragState.startScrollLeft - deltaX;
   };
 
-  const finishDrag = (event: PointerEvent<HTMLDivElement>) => {
+  const finishCurrentDrag = () => {
+    dragStateRef.current = { ...initialDragState };
+    setIsDragging(false);
+
+    if (blockClickRef.current) {
+      window.setTimeout(() => {
+        blockClickRef.current = false;
+      }, 0);
+    }
+  };
+
+  const finishPointerDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "mouse") return;
+
     const viewport = viewportRef.current;
     const dragState = dragStateRef.current;
     if (!viewport || !dragState.active || dragState.pointerId !== event.pointerId) {
@@ -123,14 +138,44 @@ export default function ProjectCarousel({ children }: ProjectCarouselProps) {
       viewport.releasePointerCapture(event.pointerId);
     }
 
-    dragStateRef.current = { ...initialDragState };
-    setIsDragging(false);
+    finishCurrentDrag();
+  };
 
-    if (blockClickRef.current) {
-      window.setTimeout(() => {
-        blockClickRef.current = false;
-      }, 0);
+  const handleMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    dragStateRef.current = {
+      active: true,
+      moved: false,
+      pointerId: -1,
+      startScrollLeft: viewport.scrollLeft,
+      startX: event.clientX,
+    };
+    setIsDragging(true);
+  };
+
+  const handleMouseMove = (event: MouseEvent<HTMLDivElement>) => {
+    const viewport = viewportRef.current;
+    const dragState = dragStateRef.current;
+    if (!viewport || !dragState.active || dragState.pointerId !== -1) return;
+
+    const deltaX = event.clientX - dragState.startX;
+    if (Math.abs(deltaX) > 5) {
+      dragState.moved = true;
+      blockClickRef.current = true;
+      event.preventDefault();
     }
+
+    viewport.scrollLeft = dragState.startScrollLeft - deltaX;
+  };
+
+  const finishMouseDrag = () => {
+    const dragState = dragStateRef.current;
+    if (!dragState.active || dragState.pointerId !== -1) return;
+    finishCurrentDrag();
   };
 
   return (
@@ -170,15 +215,22 @@ export default function ProjectCarousel({ children }: ProjectCarouselProps) {
         aria-live="off"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
-        onPointerUp={finishDrag}
-        onPointerCancel={finishDrag}
+        onPointerUp={finishPointerDrag}
+        onPointerCancel={finishPointerDrag}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={finishMouseDrag}
+        onMouseLeave={finishMouseDrag}
+        onDragStart={(event) => event.preventDefault()}
         onClickCapture={(event) => {
           if (!blockClickRef.current) return;
           event.preventDefault();
           event.stopPropagation();
         }}
-        className={`project-carousel flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 select-none ${
-          isDragging ? "cursor-grabbing" : "cursor-grab"
+        className={`project-carousel flex gap-5 overflow-x-auto pb-3 select-none ${
+          isDragging
+            ? "cursor-grabbing snap-none"
+            : "cursor-grab snap-x snap-mandatory"
         }`}
       >
         {items.map((child, index) => (
