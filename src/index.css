@@ -32,9 +32,10 @@ html {
 }
 
 .project-carousel {
+  -webkit-overflow-scrolling: touch;
   overscroll-behavior-inline: contain;
   scrollbar-width: none;
-  touch-action: pan-y;
+  touch-action: pan-x pan-y;
 }
 
 .project-carousel::-webkit-scrollbar {
