@@ -21,6 +21,10 @@ test("운영 응답에 브라우저 보안 헤더를 적용한다", () => {
   assert.equal(headers["X-Content-Type-Options"], "nosniff");
   assert.equal(headers["Referrer-Policy"], "strict-origin-when-cross-origin");
   assert.ok(headers["Permissions-Policy"]);
+  assert.equal(vercelConfig.routes, undefined);
+  assert.deepEqual(vercelConfig.rewrites, [
+    { source: "/(.*)", destination: "/index.html" },
+  ]);
 });
 
 test("변경 요청 전에 CSRF 토큰을 받아 전송한다", () => {
